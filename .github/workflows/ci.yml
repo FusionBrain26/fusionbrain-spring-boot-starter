@@ -86,7 +86,7 @@ jobs:
           name: test-results
 
       - name: Publish Test Results
-        if: always()
+        if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push'
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           junit_files: target/surefire-reports/*.xml
