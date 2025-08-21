@@ -1,0 +1,101 @@
+{
+  "groups": [
+    {
+      "name": "fusionbrain",
+      "type": "ai.fusionbrain.config.FusionBrainProperties",
+      "description": "Configuration properties for FusionBrain API integration."
+    }
+  ],
+  "properties": [
+    {
+      "name": "fusionbrain.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether FusionBrain API integration is enabled.",
+      "defaultValue": true
+    },
+    {
+      "name": "fusionbrain.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL for the FusionBrain API.",
+      "defaultValue": "https://api-key.fusionbrain.ai",
+      "validation": {
+        "notEmpty": true
+      }
+    },
+    {
+      "name": "fusionbrain.api-key",
+      "type": "java.lang.String",
+      "description": "API key required for authenticating requests.",
+      "validation": {
+        "notEmpty": true
+      }
+    },
+    {
+      "name": "fusionbrain.api-secret",
+      "type": "java.lang.String",
+      "description": "API secret required for authenticating requests.",
+      "validation": {
+        "notEmpty": true
+      }
+    },
+    {
+      "name": "fusionbrain.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for failed requests.",
+      "defaultValue": 5,
+      "validation": {
+        "min": 0
+      }
+    },
+    {
+      "name": "fusionbrain.poll-interval",
+      "type": "java.lang.Long",
+      "description": "Interval between polling attempts for asynchronous operations (in seconds).",
+      "defaultValue": 3,
+      "validation": {
+        "min": 1
+      }
+    },
+    {
+      "name": "fusionbrain.async-core-pool-size",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of threads for asynchronous operations.",
+      "defaultValue": 1,
+      "validation": {
+        "min": 1
+      }
+    },
+    {
+      "name": "fusionbrain.ssl.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether SSL certificate validation is enabled."
+    },
+    {
+      "name": "fusionbrain.ssl.truststore",
+      "type": "java.lang.String",
+      "description": "Path to a truststore file (classpath: or file: prefix)"
+    },
+    {
+      "name": "fusionbrain.ssl.truststore-password",
+      "type": "java.lang.String",
+      "description": "Truststore password"
+    },
+    {
+      "name": "fusionbrain.ssl.truststore-type",
+      "type": "java.lang.String",
+      "description": "Truststore type (JKS, PKCS12)",
+      "defaultValue": "JKS"
+    }
+  ],
+  "hints": [
+    {
+      "name": "fusionbrain.base-url",
+      "values": [
+        {
+          "value": "https://api-key.fusionbrain.ai",
+          "description": "Production API endpoint"
+        }
+      ]
+    }
+  ]
+}

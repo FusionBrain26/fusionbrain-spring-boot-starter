@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual triggering via UI
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [17]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Maven Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Compile with Maven
+        run: |
+          mvn --batch-mode --errors --fail-at-end --show-version compile
+        env:
+          MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: target/
+          if-no-files-found: error
+
+  test:
+    name: Test & Coverage
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [17]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Restore Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: target/
+
+      - name: Run Tests and Generate Coverage
+        run: |
+          mvn --batch-mode --errors --fail-at-end --show-version clean verify jacoco:report
+        env:
+          MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          path: target/surefire-reports/*.xml
+          name: test-results
+
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          junit_files: target/surefire-reports/*.xml
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          path: target/site/jacoco/jacoco.xml
+          name: coverage-report
+
+      - name: Expose Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: target/site/jacoco/jacoco.xml
+        if: always()

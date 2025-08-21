@@ -1,0 +1,7 @@
+fusionbrain:
+  enabled: true
+  ssl:
+    enabled: true
+    truststore: classpath:truststore.jks
+    truststore-password: changeit
+    truststore-type: JKS
