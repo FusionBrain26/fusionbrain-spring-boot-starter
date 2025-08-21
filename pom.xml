@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.fb.fusionbrain</groupId>
+    <groupId>ai.fusionbrain</groupId>
     <artifactId>fusionbrain-spring-boot-starter</artifactId>
     <version>1.0.0</version>
     <name>FusionBrain Spring Boot Starter</name>
