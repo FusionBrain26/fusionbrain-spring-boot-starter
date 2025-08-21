@@ -1,6 +1,6 @@
 # FusionBrain Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/ru.fb.fusionbrain/fusionbrain-spring-boot-starter)](https://central.sonatype.com/artifact/ru.fb.fusionbrain/fusionbrain-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/ai.fusionbrain/fusionbrain-spring-boot-starter)](https://central.sonatype.com/artifact/ai.fusionbrain/fusionbrain-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Spring Boot Starter for seamless integration with FusionBrain AI API.
@@ -20,7 +20,7 @@ Add the dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>ru.fb.fusionbrain</groupId>
+    <groupId>ai.fusionbrain</groupId>
     <artifactId>fusionbrain-spring-boot-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -30,7 +30,7 @@ Add the dependency to your `pom.xml`:
 Add the dependency to your `build.gradle`:
 
 ```groovy
-implementation 'ru.fb.fusionbrain:fusionbrain-spring-boot-starter:1.0.0'
+implementation 'ai.fusionbrain:fusionbrain-spring-boot-starter:1.0.0'
 ```
 
 ## Configuration
@@ -74,12 +74,12 @@ fusionbrain:
 
 ```java
 import org.springframework.stereotype.Service;
-import client.ai.fusionbrain.FusionBrainClient;
-import dto.ai.fusionbrain.EPipelineType;
-import dto.ai.fusionbrain.RunResponse;
-import dto.ai.fusionbrain.StatusResponse;
-import request.dto.ai.fusionbrain.GenerateParams;
-import request.dto.ai.fusionbrain.Text2ImageParams;
+import ai.fusionbrain.client.FusionBrainClient;
+import ai.fusionbrain.dto.EPipelineType;
+import ai.fusionbrain.dto.RunResponse;
+import ai.fusionbrain.dto.StatusResponse;
+import ai.fusionbrain.dto.request.GenerateParams;
+import ai.fusionbrain.dto.request.Text2ImageParams;
 
 import java.util.concurrent.CompletableFuture;
 

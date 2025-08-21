@@ -44,6 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     container: maven:3.9.6-eclipse-temurin-17
     needs: build
+    permissions:
+      checks: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -90,6 +93,7 @@ jobs:
         if: always()
         with:
           report_paths: target/surefire-reports/*.xml
+          check_name: JUnit Test Report
 
       - name: Publish Code Coverage
         uses: codecov/codecov-action@v4
