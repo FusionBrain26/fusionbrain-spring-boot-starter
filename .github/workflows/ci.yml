@@ -143,6 +143,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-publish-
 
+      - name: Install GPG
+        run: |
+          apt-get update
+          apt-get install -y gnupg
+
       # Импорт GPG ключа
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
