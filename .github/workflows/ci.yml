@@ -12,9 +12,6 @@ on:
 env:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  # Используем версию из тега, если есть, иначе SNAPSHOT
-  # Эта переменная используется в скриптах, но не напрямую в mvn команде (см. ниже)
-  ARTIFACT_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || format('{0}-SNAPSHOT', github.sha) }}
 
 jobs:
   build:
