@@ -125,8 +125,7 @@ jobs:
     steps:
       - name: Install GPG
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gnupg
+          apt-get install -y gnupg
 
       - name: Checkout code
         uses: actions/checkout@v4
