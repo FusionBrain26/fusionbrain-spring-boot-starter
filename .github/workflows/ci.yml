@@ -147,9 +147,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           server-id: central
-          server-username: ${{ secrets.OSSRH_USERNAME }}
-          server-password: ${{ secrets.OSSRH_TOKEN }}
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
 
       # Выполнить сборку (package), подпись (gpg:sign) и публикацию (deploy)
