@@ -116,7 +116,6 @@ jobs:
     # Запускать только при создании тега (релиз)
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     needs: test # Убедиться, что тесты пройдены перед публикацией
     environment: "publish"
     permissions:
@@ -143,29 +142,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-publish-
 
-      - name: Install GPG
-        run: |
-          apt-get update
-          apt-get install -y gnupg
-
-      # Импорт GPG ключа
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
+      - uses: actions/setup-java@v4
         with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
-      # Создать settings.xml с серверными данными для OSSRH
-      - name: Setup Maven settings for OSSRH
-        uses: s4u/maven-settings-action@v3.1.0
-        with:
-          servers: '
-            [{
-              "id": "central",
-              "username": "${{ secrets.OSSRH_USERNAME }}",
-              "password": "${{ secrets.OSSRH_TOKEN }}"
-            }]
-          '
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: central
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_TOKEN }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
 
       # Выполнить сборку (package), подпись (gpg:sign) и публикацию (deploy)
       # Профиль 'release' активирует плагин maven-gpg-plugin
@@ -175,5 +160,4 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          # Переменные для GPG плагина
-          GPG_TTY: $(tty)
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

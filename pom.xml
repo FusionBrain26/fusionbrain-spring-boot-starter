@@ -272,14 +272,6 @@
         </plugins>
     </build>
 
-    <!-- Distribution Management for Maven Central (Sonatype OSSRH) -->
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://central.sonatype.com</url>
-        </repository>
-    </distributionManagement>
-
     <profiles>
         <profile>
             <id>release</id>
