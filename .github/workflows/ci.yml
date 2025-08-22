@@ -118,6 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     container: maven:3.9.6-eclipse-temurin-17
     needs: test # Убедиться, что тесты пройдены перед публикацией
+    environment: "publish"
     permissions:
       contents: read
 
