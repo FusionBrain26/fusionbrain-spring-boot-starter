@@ -28,8 +28,10 @@ jobs:
       - name: Set Version (if tagged)
         if: github.ref_type == 'tag'
         run: |
-          echo "Setting version to ${{ github.ref_name }}"
-          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+          TAG_VERSION="${{ github.ref_name }}"
+          MAVEN_VERSION=${TAG_VERSION#v}
+          echo "Git tag is $TAG_VERSION, setting Maven version to $MAVEN_VERSION"
+          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=$MAVEN_VERSION -DgenerateBackupPoms=false
 
       - name: Cache Maven dependencies
         uses: actions/cache@v4
@@ -65,8 +67,10 @@ jobs:
       - name: Set Version (if tagged)
         if: github.ref_type == 'tag'
         run: |
-          echo "Setting version to ${{ github.ref_name }}"
-          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+          TAG_VERSION="${{ github.ref_name }}"
+          MAVEN_VERSION=${TAG_VERSION#v}
+          echo "Git tag is $TAG_VERSION, setting Maven version to $MAVEN_VERSION"
+          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=$MAVEN_VERSION -DgenerateBackupPoms=false
 
       - name: Cache Maven dependencies
         uses: actions/cache@v4
@@ -127,8 +131,10 @@ jobs:
       # Установка версии из тега
       - name: Set Release Version
         run: |
-          echo "Setting version to ${{ github.ref_name }}"
-          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+          TAG_VERSION="${{ github.ref_name }}"
+          MAVEN_VERSION=${TAG_VERSION#v}
+          echo "Git tag is $TAG_VERSION, setting Maven version to $MAVEN_VERSION"
+          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=$MAVEN_VERSION -DgenerateBackupPoms=false
 
       - name: Cache Maven dependencies
         uses: actions/cache@v4
