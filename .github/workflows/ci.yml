@@ -3,6 +3,8 @@ name: CI Pipeline
 on:
   push:
     branches: [ main ]
+    tags: # Запускать публикацию при создании тега
+      - 'v*' # Предполагается, что теги имеют формат v1.0.0, v1.0.1 и т.д.
   pull_request:
     branches: [ main ]
   workflow_dispatch:  # Manual trigger from UI
@@ -10,6 +12,9 @@ on:
 env:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  # Используем версию из тега, если есть, иначе SNAPSHOT
+  # Эта переменная используется в скриптах, но не напрямую в mvn команде (см. ниже)
+  ARTIFACT_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || format('{0}-SNAPSHOT', github.sha) }}
 
 jobs:
   build:
@@ -20,12 +25,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set Version (if tagged)
+        if: github.ref_type == 'tag'
+        run: |
+          echo "Setting version to ${{ github.ref_name }}"
+          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: |
             .m2/repository
-            target
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
@@ -52,12 +62,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set Version (if tagged)
+        if: github.ref_type == 'tag'
+        run: |
+          echo "Setting version to ${{ github.ref_name }}"
+          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: |
             .m2/repository
-            target
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
@@ -70,7 +85,7 @@ jobs:
 
       - name: Run tests
         run: |
-          mvn $MAVEN_CLI_OPTS clean
+          # mvn $MAVEN_CLI_OPTS clean # Обычно не нужно, если артефакты уже собраны
           mvn $MAVEN_CLI_OPTS verify
           mvn $MAVEN_CLI_OPTS jacoco:report
 
@@ -94,3 +109,62 @@ jobs:
         with:
           report_paths: target/surefire-reports/*.xml
           check_name: JUnit Test Report
+
+  publish:
+    name: Publish to Maven Central
+    # Запускать только при создании тега (релиз)
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    container: maven:3.9.6-eclipse-temurin-17
+    needs: test # Убедиться, что тесты пройдены перед публикацией
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Установка версии из тега
+      - name: Set Release Version
+        run: |
+          echo "Setting version to ${{ github.ref_name }}"
+          mvn $MAVEN_CLI_OPTS versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .m2/repository
+          key: ${{ runner.os }}-maven-publish-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-publish-
+
+      # Импорт GPG ключа
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      # Создать settings.xml с серверными данными для OSSRH
+      - name: Setup Maven settings for OSSRH
+        uses: s4u/maven-settings-action@v3.1.0
+        with:
+          servers: '
+            [{
+              "id": "ossrh",
+              "username": "${{ secrets.OSSRH_USERNAME }}",
+              "password": "${{ secrets.OSSRH_TOKEN }}"
+            }]
+          '
+
+      # Выполнить сборку (package), подпись (gpg:sign) и публикацию (deploy)
+      # Профиль 'release' активирует плагин maven-gpg-plugin
+      - name: Publish to Maven Central (OSSRH)
+        run: |
+          mvn $MAVEN_CLI_OPTS clean deploy -Prelease -DskipTests
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          # Переменные для GPG плагина
+          GPG_TTY: $(tty)

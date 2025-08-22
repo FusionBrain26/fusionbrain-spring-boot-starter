@@ -7,8 +7,31 @@
     <groupId>ai.fusionbrain</groupId>
     <artifactId>fusionbrain-spring-boot-starter</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
+
     <name>FusionBrain Spring Boot Starter</name>
     <description>Spring Boot Starter for FusionBrain API</description>
+    <url>https://github.com/FusionBrain26/fusionbrain-spring-boot-starter</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name> <!-- Укажите вашу лицензию -->
+            <url>https://www.opensource.org/licenses/mit-license.php</url> <!-- URL лицензии -->
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Setrakov Sergey</name>
+            <email>sergey.setrakov@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/FusionBrain26/fusionbrain-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:FusionBrain26/fusionbrain-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/FusionBrain26/fusionbrain-spring-boot-starter/tree/main</url>
+    </scm>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -32,6 +55,8 @@
         <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
         <maven.install.plugin.version>3.1.4</maven.install.plugin.version>
+        <maven.deploy.plugin.version>3.1.3</maven.deploy.plugin.version>
+        <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
 
         <!-- JaCoCo properties -->
         <jacoco.version>0.8.11</jacoco.version>
@@ -237,6 +262,55 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
+
+    <!-- Distribution Management for Maven Central (Sonatype OSSRH) -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- GPG Plugin для подписи артефактов -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven.gpg.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <argument>--pinentry-mode</argument>
+                                        <argument>loopback</argument>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
